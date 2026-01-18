@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>知識王對戰</title>
+<style>
+#bar { height: 20px; background: green; transition: width 1s linear; }
+.correct { color: green; font-weight: bold; }
+.wrong { color: red; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>知識王即時對答</h1>
+
+<input id="name" placeholder="你的名字">
+<button onclick="join()">加入</button>
+
+<div id="timer"><div id="bar"></div></div>
+
+<h2 id="q"></h2>
+<div id="choices"></div>
+<p id="result"></p>
+
+<h3>排行榜</h3>
+<ul id="scores"></ul>
+
+<button onclick="socket.emit('next')">下一題（主持人）</button>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+
+function join() {
+  socket.emit('join', document.getElementById('name').value);
+}
+
+socket.on('question', q => {
+  document.getElementById('q').innerText = q.question;
+  document.getElementById('choices').innerHTML =
+    ['A','B','C','D'].map(k =>
+      `<button onclick="socket.emit('answer','${k}')">${k}: ${q[k]}</button>`
+    ).join('');
+});
+
+socket.on('timer', t => {
+  document.getElementById('bar').style.width = (t * 10) + '%';
+});
+
+socket.on('result', r => {
+  document.getElementById('result').innerText =
+    r.correct ? `答對 +${r.points}` : '答錯';
+});
+
+socket.on('reveal', ans => {
+  document.getElementById('result').innerText = '正確答案：' + ans;
+});
+
+socket.on('scores', data => {
+  document.getElementById('scores').innerHTML =
+    Object.values(data)
+      .sort((a,b)=>b.score-a.score)
+      .map(s => `<li>${s.name}：${s.score}</li>`)
+      .join('');
+});
+</script>
+
+</body>
+</html>
