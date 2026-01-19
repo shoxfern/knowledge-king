@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>主持人控制台</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@700&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Noto Sans TC',sans-serif;background:#222;color:#fff;text-align:center}
+button{font-size:24px;margin:10px;padding:15px 30px}
+</style>
+</head>
+<body>
+<h1>🎤 主持人控制台</h1>
+<button onclick="nextQuestion()">➡ 下一題</button>
+<button onclick="revealAnswer()">✅ 公布答案</button>
+<button onclick="resetGame()">🔄 重置遊戲</button>
+<script>
+let channel=new BroadcastChannel('quiz');
+function nextQuestion(){channel.postMessage({type:'next'})}
+function revealAnswer(){channel.postMessage({type:'reveal'})}
+function resetGame(){channel.postMessage({type:'reset'})}
+</script>
+</body>
+</html>
